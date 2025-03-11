@@ -109,10 +109,13 @@ def index():
 def question():
     difficulty = session.get('difficulty', 'easy')
     q = get_question(difficulty)
+    # Make a copy of the choices and shuffle them
+    choices = q['choices'][:]
+    random.shuffle(choices)
     # Save the current question data in the session for answer checking
     session['current_answer'] = q['answer']
     session['current_question'] = q['question']
-    session['current_choices'] = q['choices']
+    session['current_choices'] = choices
     return render_template_string('''
         <h2>Difficulty: {{ difficulty.capitalize() }}</h2>
         <p><strong>{{ question }}</strong></p>
@@ -122,7 +125,7 @@ def question():
             {% endfor %}
         </form>
         <p>Correct answers in this level: {{ correct_count }} / 3</p>
-    ''', difficulty=difficulty, question=q['question'], choices=q['choices'], correct_count=session.get('correct_count', 0))
+    ''', difficulty=difficulty, question=q['question'], choices=choices, correct_count=session.get('correct_count', 0))
 
 @app.route('/answer', methods=['POST'])
 def answer():
